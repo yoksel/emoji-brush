@@ -29,6 +29,9 @@ export default class EmojiBrush extends HTMLElement {
       counter: 0
     };
 
+    // Fix filling path is mouse moves too fast
+    this.pathFills = {};
+
     this.symbols = {
       str: themes[0],
       currentPos: 0,
@@ -253,6 +256,25 @@ export default class EmojiBrush extends HTMLElement {
       this.textPathMirrored.insertAdjacentHTML('beforeEnd', symbol);
     }
   }
+
+  fillRestOfPath(params = {}) {
+    const {path, textPath, textPathDouble} = params;
+    const pathToAdjust = path || this.path.elem;
+    const textPathToAdjust = textPath || this.textPath;
+    const textPathDoubleToAdjust = textPath || this.textPath;
+
+    const pathFillsMax = pathToAdjust.getTotalLength() / this.fontSize + this.path.offset;
+    const tSpansLength = textPathToAdjust.children.length;
+    let missedSymbols = pathFillsMax - tSpansLength;
+
+    if(!missedSymbols) {
+      return;
+    }
+    for(let i = 0; i < missedSymbols; i++) {
+      this.updateText(params);
+    }
+  }
+
 
   getSymbol() {
     let symbol = this.symbols.list[this.symbols.currentPos];
