@@ -379,22 +379,35 @@ export default class EmojiBrush extends HTMLElement {
   changeFontSize() {
     this.fontSize = this.selectFontSize.value;
     this.style.setProperty('--font-size', `${this.fontSize}px`);
+    this.pathFills.koeff = 3;
 
-    // Add later; Need fill tail of path if font too small
-    // this.changeFontSizeOnSelected();
+    if(this.fontSize >= 32) {
+      this.pathFills.koeff = 2;
+    }
+    else if(this.fontSize >= 40) {
+      this.pathFills.koeff = 1;
+    }
+
+    this.changeFontSizeOnSelected();
   }
 
   changeFontSizeOnSelected() {
-    if(Object.values(this.selected).length > 0) {
-      for(let key in this.selected) {
-        const texts = this.selected[key].querySelectorAll('text');
-        const path = this.selected[key].querySelector('path');
-        path.style.strokeWidth = this.fontSize;
+    if(Object.values(this.selected).length === 0) {
+      return;
+    }
+    for(let key in this.selected) {
+      const texts = this.selected[key].querySelectorAll('text');
+      const path = this.selected[key].querySelector('path');
+      const textPath = this.selected[key].querySelector('textPath');
+      path.style.strokeWidth = this.fontSize;
 
-        for(let text of texts) {
-          text.style.fontSize = `${this.fontSize}px`;
-        }
+      for(let text of texts) {
+        text.style.fontSize = `${this.fontSize}px`;
       }
+      this.fillRestOfPath({
+        path,
+        textPath
+      });
     }
   }
 
