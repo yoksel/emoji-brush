@@ -12,12 +12,14 @@ const lineStyles = {
   'mirrored': {
     name: 'mirrored',
     props: {
+      double: true,
       mirrored: true
     }
   },
   'mirrored-offset': {
     name: 'mirrored-offset',
     props: {
+      double: true,
       mirrored: true,
       startOffset: true
     }
@@ -25,30 +27,49 @@ const lineStyles = {
   'mirrored-offset-between': {
     name: 'mirrored-offset-between',
     props: {
+      double: true,
       mirrored: true,
       startOffsetBetween: true
     }
   },
-  // todo
-  'waves': {
-    name: 'waves',
+  'double-rotated': {
+    name: 'double-rotated',
     props: {
-      mirrored: true,
-      startOffset: true,
-      rotated: true,
-      waves: true
+      // double: true,
+      offsetted: true,
+      // rotated: true,
+      // startOffset: true
     }
   },
+  // 'double-rotated-offset-between': {
+  //   name: 'double-rotated-offset-between',
+  //   props: {
+  //     double: true,
+  //     offsetted: true,
+  //     rotated: true,
+  //     startOffsetBetween: true
+  //   }
+  // },
   // todo
-  'scattered': {
-    name: 'scattered',
-    props: {
-      // mirrored: true,
-      // startOffset: true,
-      // scattered: true,
-      // rotated: true
-    }
-  }
+  // 'waves': {
+  //   name: 'waves',
+  //   props: {
+  //     mirrored: true,
+  //     startOffset: true,
+  //     rotated: true,
+  //     waves: true
+  //   }
+  // },
+  // todo
+  // 'scattered': {
+  //   name: 'scattered',
+  //   props: {
+  //     // mirrored: true,
+  //     // startOffset: true,
+  //     // scattered: true,
+  //     // rotated: true
+  //   }
+  // }
 };
 
 export default lineStyles;

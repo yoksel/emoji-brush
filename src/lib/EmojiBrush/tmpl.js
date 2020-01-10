@@ -40,6 +40,10 @@ templateMarkup.innerHTML = `<style>
     pointer-events: none;
   }
 
+  textPath {
+    fill: var(--color-base);
+  }
+
   .panel {
     position: absolute;
     top: 1rem;
@@ -47,10 +51,11 @@ templateMarkup.innerHTML = `<style>
   }
 
   SELECT {
-    line-height: 2rem;
     height: 2rem;
     max-width: 200px;
     font: inherit;
+    line-height: 2rem;
+    vertical-align: middle;
   }
 
   .highlight {
