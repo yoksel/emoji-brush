@@ -1,3 +1,8 @@
+const ignoredUnicodeModifiers = {
+  65038: 1, // &#xFE0E, text modifier
+  65039: 1, // &#xFE0F, emoji modifier
+};
+
 export const getStep = ({from, to}) => {
   const moveX = Math.abs(to.x - from.x);
   const moveY = Math.abs(to.y - from.y);
@@ -20,12 +25,22 @@ export const getScale = (measurePath) => {
 
 export const getSymbolsList = (str) => {
   const list = [];
+  let index = 0;
 
   for (let char of str) {
-    if(char) {
-      list.push(char);
+    let unicodeNum = char.codePointAt();
+    // Ignore emoji modifiers
+    // fix problem for emoji like this ⭐️
+    // for..of can't handle it like one symbol
+    if(!char || ignoredUnicodeModifiers[unicodeNum]) {
+      index++;
+      continue;
     }
+
+    // Add emoji modifier to every symbol
+    list.push(`${char}&#xFE0F`);
   }
+
   return list;
 };
 
@@ -49,3 +64,19 @@ export const fillTemplate = ({tmpl, data}) => {
     return '';
   });
 }
+
+export const getEmojiStrLength = (str) => {
+  let counter = 0;
+
+  for (let char of str) {
+    let unicodeNum = char.codePointAt();
+
+    if(!char || ignoredUnicodeModifiers[unicodeNum]) {
+      continue;
+    }
+
+    counter++;
+  }
+
+  return counter;
+};
