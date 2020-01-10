@@ -361,9 +361,6 @@ export default class EmojiBrush extends HTMLElement {
         textPath.innerHTML = '';
       }
 
-      console.log('textPaths')
-      console.log(textPaths)
-
       this.fillRestOfPath({
         path,
         textPath: textPaths[0],
