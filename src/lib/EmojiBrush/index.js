@@ -345,6 +345,31 @@ export default class EmojiBrush extends HTMLElement {
     this.symbols.str = this.selectSymbols.value;
     this.symbols.list = getSymbolsList(this.symbols.str);
     this.symbols.currentPos = 0;
+
+    this.changeSymbolsOnSelected();
+  }
+
+  changeSymbolsOnSelected() {
+    if(Object.values(this.selected).length === 0) {
+      return;
+    }
+    for(let key in this.selected) {
+      const path = this.selected[key].querySelector('path');
+      const textPaths = this.selected[key].querySelectorAll('textPath');
+
+      for (let textPath of textPaths) {
+        textPath.innerHTML = '';
+      }
+
+      console.log('textPaths')
+      console.log(textPaths)
+
+      this.fillRestOfPath({
+        path,
+        textPath: textPaths[0],
+        textPathDouble: textPaths[1]
+      });
+    }
   }
 
   changeStyle() {
