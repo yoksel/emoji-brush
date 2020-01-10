@@ -51,15 +51,15 @@ const lineStyles = {
   //   }
   // },
   // todo
-  // 'waves': {
-  //   name: 'waves',
-  //   props: {
-  //     mirrored: true,
-  //     startOffset: true,
-  //     rotated: true,
-  //     waves: true
-  //   }
-  // },
+  'waves': {
+    name: 'waves',
+    props: {
+      // double: true,
+      // mirrored: true,
+      // startOffset: true,
+      waves: true
+    }
+  },
   // todo
   // 'scattered': {
   //   name: 'scattered',

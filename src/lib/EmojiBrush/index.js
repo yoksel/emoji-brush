@@ -29,6 +29,19 @@ export default class EmojiBrush extends HTMLElement {
       counter: 0
     };
 
+    // Try to draw straight light, add later
+    this.moveThreshold = {
+       value: 20,
+       default: 20
+    };
+    this.isStraightLine = false;
+
+    this.waves = {
+      counter: 0,
+      max: 2,
+      idDirectionUp: true
+    };
+
     // Fix filling path is mouse moves too fast
     this.pathFills = {};
 
@@ -48,6 +61,7 @@ export default class EmojiBrush extends HTMLElement {
     this.changeStyle = this.changeStyle.bind(this);
     this.changeFontSize = this.changeFontSize.bind(this);
     this.bodyKeyUp = this.bodyKeyUp.bind(this);
+    this.bodyKeyDown = this.bodyKeyDown.bind(this);
     this.changeTheme = this.changeTheme.bind(this);
 
     this.initSelect({
@@ -82,6 +96,7 @@ export default class EmojiBrush extends HTMLElement {
     this.paintArea.addEventListener('mouseup', this.onMouseUp);
 
     document.body.addEventListener('keyup', this.bodyKeyUp);
+    // document.body.addEventListener('keydown', this.bodyKeyDown);
 
     document.addEventListener('change-theme', this.changeTheme);
   }
@@ -157,7 +172,7 @@ export default class EmojiBrush extends HTMLElement {
     }
 
     if(this.lineStyle.props.offsetted) {
-      this.text.setAttribute('dy', '-1em');
+      // this.text.setAttribute('dy', '-1em');
       // this.text.setAttribute('transform', `translate(0,-${this.fontSize/2})`);
       // this.textDouble.setAttribute('transform', `translate(0,${this.fontSize/2})`)
     }
@@ -173,6 +188,11 @@ export default class EmojiBrush extends HTMLElement {
     }
 
     this.setRotation();
+
+    if(this.lineStyle.props.waves) {
+      this.waves.counter = 0;
+      this.waves.idDirectionUp = true;
+    }
   }
 
   setRotation() {
@@ -189,12 +209,13 @@ export default class EmojiBrush extends HTMLElement {
     let coords = this.getMouseOffset(event);
     let {start} = this.path;
 
+
     const moveSize = getStep({
       from: this.lastPoint,
       to: coords
     });
 
-    if(moveSize > 20) {
+    if(moveSize > this.moveThreshold.value) {
       this.points.push(coords);
       this.updatePath(coords);
       this.updateText();
@@ -239,6 +260,17 @@ export default class EmojiBrush extends HTMLElement {
   bodyKeyUp(event) {
     if(event.keyCode === 8 || event.keyCode === 46) {
       this.removePaths();
+    }
+    // Unpress shift, not used now
+    else if(event.keyCode === 16) {
+      this.isStraightLine = false;
+    }
+  }
+
+  bodyKeyDown(event) {
+    // Press shift, not used now
+    if(event.keyCode === 16) {
+      this.isStraightLine = true;
     }
   }
 
@@ -301,26 +333,63 @@ export default class EmojiBrush extends HTMLElement {
 
   getSymbol() {
     let symbol = this.symbols.list[this.symbols.currentPos];
-    let rotate = '';
+    let rotateAttr = this.getRotateAttr();
+    let dyAttr = this.getDYWavesAttr();
 
     this.symbols.currentPos++;
+
     if(this.symbols.currentPos === this.symbols.list.length) {
       this.symbols.currentPos = 0;
     }
 
-    if(this.lineStyle.props.rotated) {
-      const angle = this.rotation.stepAngle * this.rotation.counter;
-      let rotate = `rotate="${angle}"`;
-
-      this.rotation.counter++;
-      if(this.rotation.counter >= this.rotation.max) {
-        this.rotation.counter = 0;
-      }
-    }
-
-    symbol = `<tspan ${rotate}>${symbol}</tspan>`
+    symbol = `<tspan ${rotateAttr}${dyAttr}>${symbol}</tspan>`
 
     return symbol;
+  }
+
+  getRotateAttr() {
+    if(!this.lineStyle.props.rotated) {
+      return '';
+    }
+
+    const angle = this.rotation.stepAngle * this.rotation.counter;
+    let rotateAttr = ` rotate="${angle}"`;
+
+    this.rotation.counter++;
+    if(this.rotation.counter >= this.rotation.max) {
+      this.rotation.counter = 0;
+    }
+
+    return rotateAttr;
+  }
+
+  getDYWavesAttr() {
+    if(!this.lineStyle.props.waves) {
+      return '';
+    }
+
+    let dyVal = this.fontSize * .55;
+    let multy = this.waves.idDirectionUp ? 1 : -1;
+    let dy = dyVal * multy;
+    let dyAttr = ` dy="${dy}"`;
+
+    // Handle waves counter
+    if(this.waves.idDirectionUp) {
+      this.waves.counter++;
+    }
+    else {
+      this.waves.counter--;
+    }
+
+    // Handle waves direction
+    if(this.waves.counter == this.waves.max) {
+      this.waves.idDirectionUp = !this.waves.idDirectionUp;
+    }
+    else if(this.waves.counter === 0) {
+      this.waves.idDirectionUp = !this.waves.idDirectionUp;
+    }
+
+    return dyAttr;
   }
 
   unselect() {
