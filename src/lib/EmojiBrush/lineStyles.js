@@ -32,25 +32,6 @@ const lineStyles = {
       startOffsetBetween: true
     }
   },
-  'double-rotated': {
-    name: 'double-rotated',
-    props: {
-      // double: true,
-      offsetted: true,
-      // rotated: true,
-      // startOffset: true
-    }
-  },
-  // 'double-rotated-offset-between': {
-  //   name: 'double-rotated-offset-between',
-  //   props: {
-  //     double: true,
-  //     offsetted: true,
-  //     rotated: true,
-  //     startOffsetBetween: true
-  //   }
-  // },
-  // todo
   'waves': {
     name: 'waves',
     props: {
