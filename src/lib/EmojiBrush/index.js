@@ -208,15 +208,25 @@ export default class EmojiBrush extends HTMLElement {
       return;
     }
 
+    // There was not mouse move
+    if(this.points.length == 0) {
+      // Remove latest path
+      this.path.group.remove();
+      this.paintArea.removeEventListener('mousemove', this.onMouseMove);
+      return;
+    }
+
     // Or continue with latest path
-    let {x, y} = this.getMouseOffset(event);
+    this.lastPoint = this.getMouseOffset(event);;
     let {start} = this.path;
     this.path.elem.classList.remove('current-path');
 
-    this.updatePath({x, y});
+    this.updatePath(this.lastPoint);
     this.updateText();
 
     this.paintArea.removeEventListener('mousemove', this.onMouseMove);
+
+    this.fillRestOfPath();
   }
 
   bodyKeyUp(event) {
@@ -248,12 +258,19 @@ export default class EmojiBrush extends HTMLElement {
       `M${start.x},${start.y} ${points} ${x},${y}`);
   }
 
-  updateText() {
-    const symbol = this.getSymbol();
-    this.textPath.insertAdjacentHTML('beforeEnd', symbol);
+  updateText(params = {}) {
+    const {textPath, textPathDouble} = params;
+    const targetTextPath = textPath || this.textPath;
+    const targetTextPathDouble = textPathDouble || this.textPathDouble;
 
-    if(this.textPathMirrored) {
-      this.textPathMirrored.insertAdjacentHTML('beforeEnd', symbol);
+    // this.pathFills.koeff need to add more symbols for tiny font-size
+    for(let i = 0; i < this.pathFills.koeff; i++) {
+      const symbol = this.getSymbol();
+      targetTextPath.insertAdjacentHTML('beforeEnd', symbol);
+
+      if(targetTextPathDouble) {
+        targetTextPathDouble.insertAdjacentHTML('beforeEnd', symbol);
+      }
     }
   }
 
