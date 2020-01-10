@@ -133,42 +133,48 @@ export default class EmojiBrush extends HTMLElement {
       counter: ++this.path.counter
     };
 
+    this.modifyPaths();
 
-    this.text = group.querySelector('text');
-    this.textPath = group.querySelector('textPath');
+    this.paintArea.addEventListener('mousemove', this.onMouseMove);
+  }
+
+  modifyPaths() {
+    const halfPatternLength = Math.round(this.symbols.list.length / 2);
+    this.text = this.path.group.querySelector('text');
+    this.textPath = this.path.group.querySelector('textPath');
+
+    if(this.lineStyle.props.double) {
+      this.textDouble = this.text.cloneNode(true);
+      this.textPathDouble = this.textDouble.querySelector('textPath');
+      this.path.group.append(this.textDouble);
+    }
 
     if(this.lineStyle.props.mirrored) {
       this.text.setAttribute('dy', '-.12em');
-
-      this.textMirrored = this.text.cloneNode(true);
-      this.textMirrored.setAttribute('rotate', 180);
-
-      if(this.lineStyle.props.scattered) {
-       this.textMirrored.setAttribute('transform', `translate(0,${this.fontSize})`);
-      }
-
-      this.textPathMirrored = this.textMirrored.querySelector('textPath');
-
-      if(this.lineStyle.props.startOffset) {
-        const halfPatternLength = Math.round(this.symbols.list.length / 2);
-        const offset = halfPatternLength * this.fontSize;
-        this.textPathMirrored.setAttribute('startOffset', `-${offset}px`);
-      }
-      if(this.lineStyle.props.startOffsetBetween) {
-        this.text.setAttribute('dy', '0');
-        const halfPatternLength = Math.round(this.symbols.list.length / 2);
-        const offset = (halfPatternLength + .5) * this.fontSize;
-        this.textPathMirrored.setAttribute('startOffset', `-${offset}px`);
-      }
-
-      // if(this.lineStyle.props.waves) {
-      //   this.text.setAttribute('dy', `-${this.fontSize}`);
-      //   this.textMirrored.setAttribute('dy', `${this.fontSize}`);
-      // }
-
-      group.append(this.textMirrored);
+      this.textDouble.setAttribute('dy', '-.12em')
+      this.textDouble.setAttribute('rotate', 180);
     }
 
+    if(this.lineStyle.props.offsetted) {
+      this.text.setAttribute('dy', '-1em');
+      // this.text.setAttribute('transform', `translate(0,-${this.fontSize/2})`);
+      // this.textDouble.setAttribute('transform', `translate(0,${this.fontSize/2})`)
+    }
+
+    if(this.lineStyle.props.startOffset) {
+      this.path.offset = halfPatternLength * this.fontSize;
+      this.textPathDouble.setAttribute('startOffset', `-${this.path.offset}px`);
+    }
+    else if(this.lineStyle.props.startOffsetBetween) {
+      // this.text.setAttribute('dy', '0');
+      this.path.offset = (halfPatternLength + .5) * this.fontSize;
+      this.textPathDouble.setAttribute('startOffset', `-${this.path.offset}px`);
+    }
+
+    this.setRotation();
+  }
+
+  setRotation() {
     if(this.lineStyle.props.rotated) {
       this.rotation = {
         ...this.rotation,
@@ -176,8 +182,6 @@ export default class EmojiBrush extends HTMLElement {
         counter: 0
       };
     }
-
-    this.paintArea.addEventListener('mousemove', this.onMouseMove);
   }
 
   onMouseMove(event) {
