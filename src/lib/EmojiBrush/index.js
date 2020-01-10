@@ -118,7 +118,8 @@ export default class EmojiBrush extends HTMLElement {
       data: {
         id: this.path.counter,
         fontSize: `${this.fontSize}px`
-      }});
+      }
+    });
     group.insertAdjacentHTML('beforeEnd',content);
     this.targetGroup.append(group);
 
@@ -193,16 +194,18 @@ export default class EmojiBrush extends HTMLElement {
       to: coords
     });
 
-    if(moveSize > 25) {
+    if(moveSize > 20) {
       this.points.push(coords);
       this.updatePath(coords);
       this.updateText();
+      this.lastPoint = coords;
     }
 
     this.clickedPath = null;
   }
 
   onMouseUp(event) {
+    // Handle click on path
     if(this.clickedPath) {
       this.mouseClickPath();
 
@@ -296,31 +299,28 @@ export default class EmojiBrush extends HTMLElement {
     }
   }
 
-
   getSymbol() {
     let symbol = this.symbols.list[this.symbols.currentPos];
-    this.symbols.currentPos++;
+    let rotate = '';
 
+    this.symbols.currentPos++;
     if(this.symbols.currentPos === this.symbols.list.length) {
       this.symbols.currentPos = 0;
     }
 
     if(this.lineStyle.props.rotated) {
       const angle = this.rotation.stepAngle * this.rotation.counter;
+      let rotate = `rotate="${angle}"`;
 
       this.rotation.counter++;
-
-      if(this.lineStyle.props.scattered) {
-        this.rotation.counter = Math.floor(Math.random() * this.rotation.max);
-      }
-
       if(this.rotation.counter >= this.rotation.max) {
         this.rotation.counter = 0;
       }
-      symbol = `<tspan rotate="${angle}">${symbol}</tspan>`
     }
 
-    return symbol;//&#xFE0F;
+    symbol = `<tspan ${rotate}>${symbol}</tspan>`
+
+    return symbol;
   }
 
   unselect() {
