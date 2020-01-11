@@ -25,7 +25,6 @@ export const getScale = (measurePath) => {
 
 export const getSymbolsList = (str) => {
   const list = [];
-  let index = 0;
 
   for (let char of str) {
     let unicodeNum = char.codePointAt();
@@ -33,7 +32,6 @@ export const getSymbolsList = (str) => {
     // fix problem for emoji like this ⭐️
     // for..of can't handle it like one symbol
     if(!char || ignoredUnicodeModifiers[unicodeNum]) {
-      index++;
       continue;
     }
 
