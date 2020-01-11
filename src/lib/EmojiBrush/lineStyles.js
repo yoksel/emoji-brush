@@ -35,9 +35,6 @@ const lineStyles = {
   'waves': {
     name: 'waves',
     props: {
-      // double: true,
-      // mirrored: true,
-      // startOffset: true,
       waves: true
     }
   },

@@ -124,6 +124,7 @@ export default class EmojiBrush extends HTMLElement {
     let start = this.getMouseOffset(event);
     this.lastPoint = start;
     this.points = [];
+    this.symbols.currentPos = 0;
 
     let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.id = `group-${this.path.counter}`;
@@ -169,6 +170,8 @@ export default class EmojiBrush extends HTMLElement {
       this.text.setAttribute('dy', '-.12em');
       this.textDouble.setAttribute('dy', '-.12em')
       this.textDouble.setAttribute('rotate', 180);
+      this.path.offset = .5 * this.fontSize;
+      this.textPathDouble.setAttribute('startOffset', `${this.path.offset}px`);
     }
 
     if(this.lineStyle.props.offsetted) {
@@ -178,12 +181,12 @@ export default class EmojiBrush extends HTMLElement {
     }
 
     if(this.lineStyle.props.startOffset) {
-      this.path.offset = halfPatternLength * this.fontSize;
+      this.path.offset = (halfPatternLength + .5) * this.fontSize;
       this.textPathDouble.setAttribute('startOffset', `-${this.path.offset}px`);
     }
     else if(this.lineStyle.props.startOffsetBetween) {
       // this.text.setAttribute('dy', '0');
-      this.path.offset = (halfPatternLength + .5) * this.fontSize;
+      this.path.offset = halfPatternLength * this.fontSize;
       this.textPathDouble.setAttribute('startOffset', `-${this.path.offset}px`);
     }
 
