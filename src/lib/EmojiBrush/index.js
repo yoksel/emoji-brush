@@ -15,10 +15,13 @@ export default class EmojiBrush extends HTMLElement {
     this.paintArea = this.elem.getElementById('paint-area');
     this.targetGroup = this.elem.getElementById('target-group');
     this.clear = this.elem.getElementById('clear');
+    this.inputSymbolsChoice = this.elem.getElementById('input-symbols-choice');
     this.selectSymbols = this.elem.getElementById('select-symbols');
+    this.addSymbols = this.elem.getElementById('add-symbols');
     this.selectStyle = this.elem.getElementById('select-style');
     this.selectFontSize = this.elem.getElementById('select-font-size');
     this.scale = getScale(this.paintArea.getElementById('measure-rect'));
+
     this.selected = {};
     this.points = [];
     this.lastPoint = {};
@@ -63,6 +66,7 @@ export default class EmojiBrush extends HTMLElement {
     this.bodyKeyUp = this.bodyKeyUp.bind(this);
     this.bodyKeyDown = this.bodyKeyDown.bind(this);
     this.changeTheme = this.changeTheme.bind(this);
+    this.chooseSymbolsInput = this.chooseSymbolsInput.bind(this);
 
     this.initSelect({
       elem: this.selectSymbols,
@@ -94,6 +98,10 @@ export default class EmojiBrush extends HTMLElement {
 
     this.paintArea.addEventListener('mousedown', this.onMouseDown);
     this.paintArea.addEventListener('mouseup', this.onMouseUp);
+
+    this.inputSymbolsChoice.addEventListener('click', this.chooseSymbolsInput);
+
+    this.addSymbols.addEventListener('input', this.changeSymbolsSet);
 
     document.body.addEventListener('keyup', this.bodyKeyUp);
     // document.body.addEventListener('keydown', this.bodyKeyDown);
@@ -263,7 +271,11 @@ export default class EmojiBrush extends HTMLElement {
   }
 
   bodyKeyUp(event) {
-    if(event.keyCode === 8 || event.keyCode === 46) {
+    const isBody = event.target.tagName === 'BODY';
+    const isDelOrBackSpace = event.keyCode === 8 || event.keyCode === 46;
+
+    // Prevent removing path while edit text in input
+    if(isBody && isDelOrBackSpace) {
       this.removePaths();
     }
     // Unpress shift, not used now
@@ -416,8 +428,30 @@ export default class EmojiBrush extends HTMLElement {
     }
   }
 
-  changeSymbolsSet() {
-    this.symbols.str = this.selectSymbols.value;
+  chooseSymbolsInput(event) {
+    const labelText = event.target.closest('.choice__label-text');
+    const input = event.target.closest('.choice__input');
+
+    if(labelText && labelText.dataset.value) {
+      this.inputSymbolsChoice.dataset.mode = labelText.dataset.value;
+    }
+
+    if(input && input.value) {
+      this.changeSymbolsSet(event);
+    }
+  }
+
+  changeSymbolsSet(event) {
+    let currentInput = this.selectSymbols;
+    if(event) {
+      currentInput = event.target;
+    }
+
+    if(!currentInput.value) {
+      return;
+    }
+
+    this.symbols.str = currentInput.value;
     this.symbols.list = getSymbolsList(this.symbols.str);
     this.symbols.currentPos = 0;
 
@@ -428,6 +462,7 @@ export default class EmojiBrush extends HTMLElement {
     if(Object.values(this.selected).length === 0) {
       return;
     }
+
     for(let key in this.selected) {
       const path = this.selected[key].querySelector('path');
       const textPaths = this.selected[key].querySelectorAll('textPath');

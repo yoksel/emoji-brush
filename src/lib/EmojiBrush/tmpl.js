@@ -7,6 +7,7 @@ templateMarkup.innerHTML = `<style>
 
     --font-size: 32px;
     font: inherit;
+    color: var(--color-base);
   }
 
   svg {
@@ -41,18 +42,26 @@ templateMarkup.innerHTML = `<style>
   }
 
   textPath {
-    fill: var(--color-base);
+    fill: currentColor;
   }
 
   .panel {
     position: absolute;
     top: 1rem;
     left: 1rem;
+    display: flex;
   }
 
-  SELECT {
+  SELECT,
+  INPUT {
     height: 2rem;
     max-width: 200px;
+    margin-left: 1rem;
+    padding: 0 .25rem;
+    box-sizing: border-box;
+    background: #EEE;
+    border: 1px solid #DDD;
+    border-radius: .25rem;
     font: inherit;
     line-height: 2rem;
     vertical-align: middle;
@@ -76,21 +85,58 @@ templateMarkup.innerHTML = `<style>
     font: inherit;
   }
 
+  .choice {
+    display: flex;
+    margin-right: 1rem;
+  }
+
+  .choice__label {
+    display: flex;
+    align-items: center;
+  }
+
+  .choice__label + .choice__label {
+    margin-left: 1rem;
+  }
+
+  .choice__label-text {
+    cursor: pointer;
+  }
+
+  .choice__input {
+    margin-left: 0;
+  }
+
+  .choice[data-mode="presets"] .choice__input--custom,
+  .choice[data-mode="custom"] .choice__input--presets {
+    display: none;
+  }
+  .choice[data-mode="presets"] .choice__label-text--presets,
+  .choice[data-mode="custom"] .choice__label-text--custom {
+    box-shadow: none;
+  }
+  .choice[data-mode="presets"] .choice__label-text--presets:hover,
+  .choice[data-mode="custom"] .choice__label-text--custom:hover {
+    box-shadow: none;
+    background: transparent;
+    color: var(--color-base);
+  }
+
   .control {
     padding: .25rem 1rem;
-    background: var(--color-base);
+    background: transparent;
     border: 0;
     border-radius: .25rem;
+    box-shadow:  0 0 0 2px var(--color-base) inset;
     font: inherit;
     cursor: pointer;
     transition: all var(--transition);
-    box-shadow: 0 0 0 2px transparent inset;
-    color: var(--color-text);
+    color: var(--color-base);
   }
   .control:not(:disabled):hover {
-    background: transparent;
-    box-shadow:  0 0 0 2px var(--color-base) inset;
-    color: var(--color-base);
+    box-shadow: 0 0 0 2px transparent inset;
+    background: var(--color-base);
+    color: var(--color-text);
   }
   .control:disabled {
     cursor: not-allowed;
@@ -110,7 +156,35 @@ templateMarkup.innerHTML = `<style>
 </svg>
 
 <div class="panel">
-  <select id="select-symbols"></select>
+  <div class="choice" id="input-symbols-choice" data-mode="presets">
+    <label class="choice__label">
+      <span
+        class="
+          choice__label-text
+          choice__label-text--presets
+          control
+        "
+        data-value="presets"
+        >Presets</span>
+      <select
+        class="choice__input choice__input--presets"
+        id="select-symbols"></select>
+    </label>
+
+    <label class="choice__label">
+      <span
+        class="
+          choice__label-text
+          choice__label-text--custom
+          control
+        "
+        data-value="custom"
+        >My symbols</span>
+      <input
+        class="choice__input choice__input--custom"
+        type="text" id="add-symbols" placeholder="Add emoji or text"/>
+    </label>
+  </div>
   <select id="select-style"></select>
   <select id="select-font-size"></select>
 </div>
