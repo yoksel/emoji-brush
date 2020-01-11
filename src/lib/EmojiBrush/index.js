@@ -1,6 +1,6 @@
 import {getStep, pointsToStr, getScale, getSymbolsList, fillSelect, fillTemplate} from './helpers.js';
 import {templateMarkup, templateGroup} from './tmpl.js';
-import themes from './themes.js';
+import symbolsList from './symbolsList.js';
 import lineStyles from './lineStyles.js';
 import colors from './colors.js';
 import fontSizes from './fontSizes.js';
@@ -46,7 +46,7 @@ export default class EmojiBrush extends HTMLElement {
     this.pathFills = {};
 
     this.symbols = {
-      str: themes[0],
+      str: symbolsList[0],
       currentPos: 0,
     };
     this.symbols.list = getSymbolsList(this.symbols.str);
@@ -66,9 +66,9 @@ export default class EmojiBrush extends HTMLElement {
 
     this.initSelect({
       elem: this.selectSymbols,
-      list: themes,
+      list: symbolsList,
       handler: this.changeSymbolsSet,
-      currentValue: themes[Math.floor(Math.random() * themes.length)]
+      currentValue: symbolsList[Math.floor(Math.random() * symbolsList.length)]
     });
 
     this.initSelect({
