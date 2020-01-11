@@ -182,10 +182,11 @@ export default class EmojiBrush extends HTMLElement {
       this.textPathDouble.setAttribute('startOffset', `${this.path.offset}px`);
     }
 
-    if(this.lineStyle.props.offsetted) {
-      // this.text.setAttribute('dy', '-1em');
-      // this.text.setAttribute('transform', `translate(0,-${this.fontSize/2})`);
-      // this.textDouble.setAttribute('transform', `translate(0,${this.fontSize/2})`)
+    if(this.lineStyle.props.scattered) {
+      this.text.setAttribute('dy', '-.13em');
+      this.textDouble.setAttribute('dy', '-.13em');
+      this.text.style.letterSpacing = '.1em' ;
+      this.textDouble.style.letterSpacing = '.1em' ;
     }
 
     if(this.lineStyle.props.startOffset) {
@@ -193,7 +194,6 @@ export default class EmojiBrush extends HTMLElement {
       this.textPathDouble.setAttribute('startOffset', `-${this.path.offset}px`);
     }
     else if(this.lineStyle.props.startOffsetBetween) {
-      // this.text.setAttribute('dy', '0');
       this.path.offset = halfPatternLength * this.fontSize;
       this.textPathDouble.setAttribute('startOffset', `-${this.path.offset}px`);
     }
@@ -322,10 +322,13 @@ export default class EmojiBrush extends HTMLElement {
 
     // this.pathFills.koeff need to add more symbols for tiny font-size
     for(let i = 0; i < this.pathFills.koeff; i++) {
-      const symbol = this.getSymbol();
+      let symbol = this.getSymbol();
       targetTextPath.insertAdjacentHTML('beforeEnd', symbol);
 
       if(targetTextPathDouble) {
+        if(this.lineStyle.props.scattered) {
+          symbol = this.getSymbol();
+        }
         targetTextPathDouble.insertAdjacentHTML('beforeEnd', symbol);
       }
     }
@@ -353,6 +356,7 @@ export default class EmojiBrush extends HTMLElement {
     let symbol = this.symbols.list[this.symbols.currentPos];
     let rotateAttr = this.getRotateAttr();
     let dyAttr = this.getDYWavesAttr();
+    let fontSizeAttr = this.getFontSizeAttr();
 
     this.symbols.currentPos++;
 
@@ -360,7 +364,7 @@ export default class EmojiBrush extends HTMLElement {
       this.symbols.currentPos = 0;
     }
 
-    symbol = `<tspan ${rotateAttr}${dyAttr}>${symbol}</tspan>`
+    symbol = `<tspan ${rotateAttr}${dyAttr}${fontSizeAttr}>${symbol}</tspan>`
 
     return symbol;
   }
@@ -386,10 +390,10 @@ export default class EmojiBrush extends HTMLElement {
       return '';
     }
 
-    let dyVal = this.fontSize * .55;
-    let multy = this.waves.idDirectionUp ? 1 : -1;
-    let dy = dyVal * multy;
-    let dyAttr = ` dy="${dy}"`;
+    let dyVal = .55;
+    let directionSign = this.waves.idDirectionUp ? 1 : -1;
+    let dy = dyVal * directionSign;
+    let dyAttr = ` dy="${dy}em"`;
 
     // Handle waves counter
     if(this.waves.idDirectionUp) {
@@ -408,6 +412,16 @@ export default class EmojiBrush extends HTMLElement {
     }
 
     return dyAttr;
+  }
+
+  getFontSizeAttr() {
+    if(!this.lineStyle.props.scattered) {
+      return '';
+    }
+
+    const fontSize = (Math.random() * 1.25 + .25).toFixed(2);
+
+    return ` font-size="${fontSize}em"`;
   }
 
   unselect() {

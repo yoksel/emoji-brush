@@ -95,8 +95,8 @@ templateMarkup.innerHTML = `<style>
     align-items: center;
   }
 
-  .choice__label + .choice__label {
-    margin-left: 1rem;
+  .choice[data-mode="presets"] .choice__label--presets {
+    margin-right: 1rem;
   }
 
   .choice__label-text {
@@ -157,7 +157,8 @@ templateMarkup.innerHTML = `<style>
 
 <div class="panel">
   <div class="choice" id="input-symbols-choice" data-mode="presets">
-    <label class="choice__label">
+    <label
+      class="choice__label choice__label--presets">
       <span
         class="
           choice__label-text
@@ -171,7 +172,8 @@ templateMarkup.innerHTML = `<style>
         id="select-symbols"></select>
     </label>
 
-    <label class="choice__label">
+    <label
+      class="choice__label choice__label--custom">
       <span
         class="
           choice__label-text

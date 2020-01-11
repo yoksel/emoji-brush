@@ -38,16 +38,15 @@ const lineStyles = {
       waves: true
     }
   },
-  // todo
-  // 'scattered': {
-  //   name: 'scattered',
-  //   props: {
-  //     // mirrored: true,
-  //     // startOffset: true,
-  //     // scattered: true,
-  //     // rotated: true
-  //   }
-  // }
+  'mirrored-random': {
+    name: 'mirrored-random',
+    props: {
+      double: true,
+      mirrored: true,
+      scattered: true,
+      startOffsetBetween: true
+    }
+  },
 };
 
 export default lineStyles;
