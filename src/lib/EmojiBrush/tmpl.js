@@ -87,7 +87,6 @@ templateMarkup.innerHTML = `<style>
 
   .choice {
     display: flex;
-    margin-right: 1rem;
   }
 
   .choice__label {
