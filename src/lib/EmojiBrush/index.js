@@ -244,6 +244,8 @@ export default class EmojiBrush extends HTMLElement {
       return;
     }
 
+    this.unselect();
+
     // Or continue with latest path
     this.lastPoint = this.getMouseOffset(event);;
     let {start} = this.path;
@@ -276,10 +278,11 @@ export default class EmojiBrush extends HTMLElement {
 
   mouseClickPath() {
     const pathId = this.clickedPath.id;
-      this.clickedPath.classList.toggle('highlight');
+    const group = this.clickedPath.closest('g');
+    group.classList.toggle('highlight');
 
-      if(this.clickedPath.classList.contains('highlight')) {
-        this.selected[pathId] = this.clickedPath.closest('g');
+    if(group.classList.contains('highlight')) {
+        this.selected[pathId] = group;
       }
       else {
         delete this.selected[pathId];

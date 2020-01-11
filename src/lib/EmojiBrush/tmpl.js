@@ -58,12 +58,12 @@ templateMarkup.innerHTML = `<style>
     vertical-align: middle;
   }
 
-  .highlight {
+  .highlight path {
     stroke: var(--color-focus);
     stroke-opacity: .65;
   }
 
-  .highlight:hover {
+  .highlight:hover path {
     stroke: var(--color-focushover);
   }
 
