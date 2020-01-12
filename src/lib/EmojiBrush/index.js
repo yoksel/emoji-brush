@@ -110,6 +110,7 @@ export default class EmojiBrush extends HTMLElement {
     // document.body.addEventListener('keydown', this.bodyKeyDown);
 
     document.addEventListener('change-theme', this.changeTheme);
+    document.addEventListener('mouseout', this.onMouseUp);
   }
 
   disconnectedCallback() {
