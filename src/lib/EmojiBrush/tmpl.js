@@ -22,7 +22,7 @@ templateMarkup.innerHTML = `<style>
 
   path {
     stroke: transparent;
-    stroke-width: 10px;
+    stroke: yellowgreen;
     stroke-opacity: .35;
     fill: none;
     transition: stroke .15s;
@@ -195,9 +195,11 @@ templateMarkup.innerHTML = `<style>
 
 export const templateGroup = document.createElement('template');
 templateGroup.innerHTML = `<path
-  id="path-{id}" d=""
-  style="stroke-width: {fontSize}"></path>
-  <text style="font-size: {fontSize}" dy=".35em">
-    <textPath href="#path-{id}"></textPath>
-  </text>
+  id="path-{id}"
+  d=""
+  stroke-width="{fontSize}"></path>
+<text
+  font-size="{fontSize}">
+  <textPath href="#path-{id}"></textPath>
+</text>
 `;

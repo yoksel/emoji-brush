@@ -562,14 +562,15 @@ export default class EmojiBrush extends HTMLElement {
     if(Object.values(this.selected).length === 0) {
       return;
     }
+
     for(let key in this.selected) {
       const texts = this.selected[key].querySelectorAll('text');
       const path = this.selected[key].querySelector('path');
       const textPath = this.selected[key].querySelector('textPath');
-      path.style.strokeWidth = this.fontSize;
+      path.setAttribute('stroke-width', this.fontSize);
 
       for(let text of texts) {
-        text.style.fontSize = `${this.fontSize}px`;
+        text.setAttribute('font-size', `${this.fontSize}px`);
       }
       this.fillRestOfPath({
         path,
