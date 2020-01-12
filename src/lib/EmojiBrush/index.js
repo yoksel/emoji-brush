@@ -284,6 +284,11 @@ export default class EmojiBrush extends HTMLElement {
 
     this.unselect();
 
+    // Try to fix random bug
+    if(!this.current.path) {
+      return;
+    }
+
     // Or continue with latest path
     this.points.last = this.getMouseOffset(event);;
     let {start} = this.current;
@@ -472,6 +477,21 @@ export default class EmojiBrush extends HTMLElement {
     }
   }
 
+  setPathOffset() {
+    const halfPatternLength = Math.round(this.symbols.list.length / 2);
+
+    if(this.lineStyle.props.mirrored) {
+      this.pathOffset = .5 * this.fontSize;
+    }
+
+    if(this.lineStyle.props.startOffset) {
+      this.pathOffset = (halfPatternLength + .5) * this.fontSize;
+    }
+    else if(this.lineStyle.props.startOffsetBetween) {
+      this.pathOffset = halfPatternLength * this.fontSize;
+    }
+  }
+
   chooseSymbolsInput(event) {
     const labelText = event.target.closest('.choice__label-text');
     const input = event.target.closest('.choice__input');
@@ -525,6 +545,8 @@ export default class EmojiBrush extends HTMLElement {
         textPathDouble = null;
       }
 
+      this.setWaves();
+
       this.fillRestOfPath({
         path,
         textPath,
@@ -539,21 +561,6 @@ export default class EmojiBrush extends HTMLElement {
     this.setPathOffset();
 
     this.changeLineStyleOnSelected();
-  }
-
-  setPathOffset() {
-    const halfPatternLength = Math.round(this.symbols.list.length / 2);
-
-    if(this.lineStyle.props.mirrored) {
-      this.pathOffset = .5 * this.fontSize;
-    }
-
-    if(this.lineStyle.props.startOffset) {
-      this.pathOffset = (halfPatternLength + .5) * this.fontSize;
-    }
-    else if(this.lineStyle.props.startOffsetBetween) {
-      this.pathOffset = halfPatternLength * this.fontSize;
-    }
   }
 
   changeLineStyleOnSelected() {

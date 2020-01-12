@@ -22,7 +22,6 @@ templateMarkup.innerHTML = `<style>
 
   path {
     stroke: transparent;
-    stroke: yellowgreen;
     stroke-opacity: .35;
     fill: none;
     transition: stroke .15s;
