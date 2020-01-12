@@ -495,6 +495,10 @@ export default class EmojiBrush extends HTMLElement {
       return;
     }
 
+    if(this.symbols.str === currentInput.value) {
+      return;
+    }
+
     this.symbols.str = currentInput.value;
     this.symbols.list = getSymbolsList(this.symbols.str);
     this.symbols.currentPos = 0;
