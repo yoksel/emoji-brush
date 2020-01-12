@@ -44,13 +44,6 @@ templateMarkup.innerHTML = `<style>
     fill: currentColor;
   }
 
-  .panel {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    display: flex;
-  }
-
   SELECT,
   INPUT {
     height: 2rem;
@@ -75,13 +68,21 @@ templateMarkup.innerHTML = `<style>
     stroke: var(--color-focushover);
   }
 
-  #clear {
+  .panel {
     position: absolute;
-    bottom: 1rem;
+    z-index: 10;
     left: 1rem;
-    line-height: 2rem;
-    height: 2rem;
-    font: inherit;
+    right: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel--top {
+    top: 2rem;
+    justify-content: flex-start;
+  }
+  .panel--bottom {
+    bottom: 2rem;
   }
 
   .choice {
@@ -127,6 +128,7 @@ templateMarkup.innerHTML = `<style>
     border-radius: .25rem;
     box-shadow:  0 0 0 2px var(--color-base) inset;
     font: inherit;
+    text-decoration: none;
     cursor: pointer;
     transition: all var(--transition);
     color: var(--color-base);
@@ -139,7 +141,38 @@ templateMarkup.innerHTML = `<style>
   .control:disabled {
     cursor: not-allowed;
     opacity: .5;
-    color: var(--color-texttransp);
+    color: var(--color-basetransp);
+  }
+
+  .controls__downloads {
+    display: none;
+    justify-content: center;
+  }
+
+  .controls[data-state="loading"] .control--get,
+  .controls[data-state="ready"] .control--get {
+    display: none;
+  }
+  .controls[data-state="loading"] .controls__downloads,
+  .controls[data-state="ready"] .controls__downloads {
+    display: flex;
+  }
+
+  .controls__downloads .control {
+    opacity: .2;
+    pointer-events: none;
+  }
+  .controls[data-state="ready"] .control {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .theme-switcher {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
   }
 </style>
 
@@ -153,7 +186,7 @@ templateMarkup.innerHTML = `<style>
   <g id="target-group"></g>
 </svg>
 
-<div class="panel">
+<div class="panel panel--top">
   <div class="choice" id="input-symbols-choice" data-mode="presets">
     <label
       class="choice__label choice__label--presets">
@@ -187,16 +220,33 @@ templateMarkup.innerHTML = `<style>
   </div>
   <select id="select-style"></select>
   <select id="select-font-size"></select>
+
+  <theme-switcher class="theme-switcher"></theme-switcher>
 </div>
 
-<button type="button" id="clear" class="control">Clear</button>
+
+<div class="panel panel--bottom">
+  <button type="button" id="clear" class="control">Clear</button>
+
+  <div class="controls">
+    <button
+      type="button"
+      class="control control--get">Get image</button>
+
+    <div class="controls__downloads">
+      <a
+        class="control control--download-png">Download PNG</a>
+    </div>
+  </div>
+</div>
 `;
 
 export const templateGroup = document.createElement('template');
 templateGroup.innerHTML = `<path
   id="path-{id}"
   d=""
-  stroke-width="{fontSize}"></path>
+  stroke-width="{fontSize}"
+  fill="none"></path>
 <text
   font-size="{fontSize}" class="text">
   <textPath href="#path-{id}" class="text-path"></textPath>

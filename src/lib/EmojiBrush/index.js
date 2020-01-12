@@ -14,13 +14,23 @@ export default class EmojiBrush extends HTMLElement {
 
     this.paintArea = this.elem.getElementById('paint-area');
     this.targetGroup = this.elem.getElementById('target-group');
-    this.clear = this.elem.getElementById('clear');
+    this.clearControl = this.elem.getElementById('clear');
     this.inputSymbolsChoice = this.elem.getElementById('input-symbols-choice');
     this.selectSymbols = this.elem.getElementById('select-symbols');
     this.addSymbols = this.elem.getElementById('add-symbols');
     this.selectStyle = this.elem.getElementById('select-style');
     this.selectFontSize = this.elem.getElementById('select-font-size');
     this.scale = getScale(this.paintArea.getElementById('measure-rect'));
+
+    this.canvas = document.createElement('canvas');
+    this.ctx = this.canvas.getContext('2d');
+
+    this.controls = this.elem.querySelector('.controls');
+    this.controlGet = this.elem.querySelector('.control--get');
+    this.controlGet.disabled = true;
+    this.links = {
+      png: this.elem.querySelector('.control--download-png')
+    };
 
     this.selected = {};
     this.points = {
@@ -71,6 +81,8 @@ export default class EmojiBrush extends HTMLElement {
     this.changeTheme = this.changeTheme.bind(this);
     this.chooseSymbolsInput = this.chooseSymbolsInput.bind(this);
     this.bodyMouseOut = this.bodyMouseOut.bind(this);
+    this.prepareImages = this.prepareImages.bind(this);
+    this.clear = this.clear.bind(this);
 
     this.initSelect({
       elem: this.selectSymbols,
@@ -95,17 +107,14 @@ export default class EmojiBrush extends HTMLElement {
   }
 
   connectedCallback() {
-    this.clear.addEventListener('click', () => {
-      this.points.list = [];
-      this.targetGroup.innerHTML = '';
-    });
+    this.clearControl.addEventListener('click', this.clear);
 
     this.paintArea.addEventListener('mousedown', this.onMouseDown);
     this.paintArea.addEventListener('mouseup', this.onMouseUp);
 
     this.inputSymbolsChoice.addEventListener('click', this.chooseSymbolsInput);
-
     this.addSymbols.addEventListener('input', this.changeSymbolsSet);
+    this.controlGet.addEventListener('click', this.prepareImages);
 
     document.body.addEventListener('keyup', this.bodyKeyUp);
     // document.body.addEventListener('keydown', this.bodyKeyDown);
@@ -313,6 +322,8 @@ export default class EmojiBrush extends HTMLElement {
     this.paintArea.removeEventListener('mousemove', this.onMouseMove);
     document.body.removeEventListener('mouseout', this.bodyMouseOut);
     this.fillRestOfPath();
+    this.controls.dataset.state = '';
+    this.controlGet.disabled = !this.targetGroup.innerHTML;
   }
 
   bodyKeyUp(event) {
@@ -497,6 +508,13 @@ export default class EmojiBrush extends HTMLElement {
     }
   }
 
+  clear() {
+    this.points.list = [];
+    this.targetGroup.innerHTML = '';
+    this.controls.dataset.state = '';
+    this.controlGet.disabled = true;
+  }
+
   setPathOffset() {
     const halfPatternLength = Math.round(this.symbols.list.length / 2);
 
@@ -677,6 +695,69 @@ export default class EmojiBrush extends HTMLElement {
     for(let key in event.detail.accents) {
       this.style.setProperty(`--color-${key}`, event.detail.accents[key]);
     }
+
+    this.controls.dataset.state = '';
+    this.theme = event.detail.colors;
+    this.accents = event.detail.accents;
+    this.outputStyle = this.getStyleStr();
+  }
+
+  prepareImages() {
+    this.finalSizes = {
+      width: window.innerWidth,
+      height: window.innerHeight
+    };
+
+    this.controls.dataset.state = 'loading';
+    this.finalSVG = this.paintArea.cloneNode(true);
+    this.finalSVG.style = this.outputStyle;
+    // Fix paint SVG on canvas in Firefox
+    this.finalSVG.setAttribute('width', `${this.finalSizes.width}px`);
+    this.finalSVG.setAttribute('height', `${this.finalSizes.height}px`);
+
+    this.preparePng();
+  }
+
+  getBackgroundStr(colorsList) {
+    let bgStr = '';
+
+    if(colorsList.length === 1) {
+      bgStr = colorsList[0]
+      return bgStr;
+    }
+
+    bgStr = `linear-gradient(to bottom, ${colorsList.join(',')})`;
+    return bgStr;
+  }
+
+  getStyleStr() {
+    return `background: ${this.getBackgroundStr(this.theme)}; color: ${this.accents.base}`;
+  }
+
+  preparePng() {
+    const xml = new XMLSerializer().serializeToString(this.finalSVG);
+    const svg64 = btoa(unescape(encodeURIComponent(xml)));
+    const b64Start = 'data:image/svg+xml;base64,';
+    const image64 = b64Start + svg64;
+
+    const imgObj = new Image();
+    imgObj.src = image64;
+    imgObj.width = this.finalSizes.width;
+    imgObj.height = this.finalSizes.height;
+
+    imgObj.addEventListener('load', () => {
+      this.canvas.width = this.finalSizes.width;
+      this.canvas.height = this.finalSizes.height;
+      this.ctx.drawImage(imgObj, 0, 0, this.canvas.width, this.canvas.height);
+
+      this.canvas.toBlob((blob) => {
+        let URLObj = window.URL || window.webkitURL;
+        this.links.png.href = URLObj.createObjectURL(blob);
+        this.links.png.download = 'emoji-brush-drawing.png';
+
+        this.controls.dataset.state = 'ready';
+      });
+    }, false);
   }
 
   getMouseOffset(event) {
