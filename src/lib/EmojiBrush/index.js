@@ -557,6 +557,11 @@ export default class EmojiBrush extends HTMLElement {
 
   changeLineStyle() {
     this.lineStyle = lineStyles[this.selectStyle.value];
+    this.symbols.currentPos = 0;
+
+    if(this.lineStyle.props.scattered) {
+      this.pathFills.koeff = 3;
+    }
 
     this.setPathOffset();
 
