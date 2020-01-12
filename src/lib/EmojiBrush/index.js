@@ -1,5 +1,5 @@
 import {getStep, pointsToStr, getScale, getSymbolsList, fillSelect, fillTemplate} from './helpers.js';
-import {templateMarkup, templateGroup} from './tmpl.js';
+import {templateStyles, templateMarkup, templateGroup} from './tmpl.js';
 import symbolsList from './symbolsList.js';
 import lineStyles from './lineStyles.js';
 import colors from './colors.js';
@@ -10,7 +10,10 @@ export default class EmojiBrush extends HTMLElement {
     super();
     this.attachShadow({mode: 'open'});
     this.elem = this.shadowRoot;
-    this.elem.appendChild(templateMarkup.content.cloneNode(true));
+    this.elem.append(
+      templateStyles.content.cloneNode(true),
+      templateMarkup.content.cloneNode(true)
+    );
 
     this.paintArea = this.elem.getElementById('paint-area');
     this.targetGroup = this.elem.getElementById('target-group');
