@@ -23,12 +23,15 @@ export default class EmojiBrush extends HTMLElement {
     this.scale = getScale(this.paintArea.getElementById('measure-rect'));
 
     this.selected = {};
-    this.points = [];
-    this.lastPoint = {};
+    this.points = {
+      list: [],
+      last: {}
+    };
     this.rotation = {
       max: 6
     };
-    this.path = {
+
+    this.current = {
       counter: 0
     };
 
@@ -61,7 +64,7 @@ export default class EmojiBrush extends HTMLElement {
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
     this.changeSymbolsSet = this.changeSymbolsSet.bind(this);
-    this.changeStyle = this.changeStyle.bind(this);
+    this.changeLineStyle = this.changeLineStyle.bind(this);
     this.changeFontSize = this.changeFontSize.bind(this);
     this.bodyKeyUp = this.bodyKeyUp.bind(this);
     this.bodyKeyDown = this.bodyKeyDown.bind(this);
@@ -78,7 +81,7 @@ export default class EmojiBrush extends HTMLElement {
     this.initSelect({
       elem: this.selectStyle,
       list: Object.values(lineStyles),
-      handler: this.changeStyle,
+      handler: this.changeLineStyle,
       currentValue: 'mirrored-offset'
     });
 
@@ -92,7 +95,7 @@ export default class EmojiBrush extends HTMLElement {
 
   connectedCallback() {
     this.clear.addEventListener('click', () => {
-      this.points = [];
+      this.points.list = [];
       this.targetGroup.innerHTML = '';
     });
 
@@ -130,17 +133,17 @@ export default class EmojiBrush extends HTMLElement {
       this.clickedPath = event.target;
     }
     let start = this.getMouseOffset(event);
-    this.lastPoint = start;
-    this.points = [];
+    this.points.last = start;
+    this.points.list = [];
     this.symbols.currentPos = 0;
 
     let group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    group.id = `group-${this.path.counter}`;
+    group.id = `group-${this.current.counter}`;
 
     const content = fillTemplate({
       tmpl: templateGroup.innerHTML,
       data: {
-        id: this.path.counter,
+        id: this.current.counter,
         fontSize: `${this.fontSize}px`
       }
     });
@@ -149,13 +152,19 @@ export default class EmojiBrush extends HTMLElement {
 
     let path = group.querySelector('path');
     path.classList.add('current-path');
+    let textPath = group.querySelector('textPath');
+    const text = group.querySelector('text');
 
-    this.path = {
-      ...this.path,
+    this.current = {
+      ...this.current,
       group,
-      elem: path,
+      path,
+      text,
+      textDouble: null,
+      textPath,
+      textPathDouble: null,
       start,
-      counter: ++this.path.counter
+      counter: ++this.current.counter
     };
 
     this.modifyPaths();
@@ -163,47 +172,49 @@ export default class EmojiBrush extends HTMLElement {
     this.paintArea.addEventListener('mousemove', this.onMouseMove);
   }
 
-  modifyPaths() {
-    const halfPatternLength = Math.round(this.symbols.list.length / 2);
-    this.text = this.path.group.querySelector('text');
-    this.textPath = this.path.group.querySelector('textPath');
+  modifyPaths(params = {}) {
+    let hasCurrent = false;
 
-    if(this.lineStyle.props.double) {
-      this.textDouble = this.text.cloneNode(true);
-      this.textPathDouble = this.textDouble.querySelector('textPath');
-      this.path.group.append(this.textDouble);
+    if(!params.text) {
+      params = this.current;
+      hasCurrent = true;
+    }
+
+    let {group, text, textDouble, textPathDouble} = params;
+
+    if(this.lineStyle.props.double && !textDouble) {
+      textDouble = text.cloneNode(true);
+      textPathDouble = textDouble.querySelector('textPath');
+
+      if(hasCurrent) {
+        this.current.textDouble = textDouble;
+        this.current.textPathDouble = textPathDouble;
+        this.current.group.append(this.current.textDouble);
+      }
     }
 
     if(this.lineStyle.props.mirrored) {
-      this.text.setAttribute('dy', '-.12em');
-      this.textDouble.setAttribute('dy', '-.12em')
-      this.textDouble.setAttribute('rotate', 180);
-      this.path.offset = .5 * this.fontSize;
-      this.textPathDouble.setAttribute('startOffset', `${this.path.offset}px`);
+      text.setAttribute('dy', '-.12em');
+      textDouble.setAttribute('dy', '-.12em')
+      textDouble.setAttribute('rotate', 180);
+      textPathDouble.setAttribute('startOffset', `${this.pathOffset}px`);
     }
 
     if(this.lineStyle.props.scattered) {
-      this.text.setAttribute('dy', '-.13em');
-      this.textDouble.setAttribute('dy', '-.13em');
-      this.text.style.letterSpacing = '.1em' ;
-      this.textDouble.style.letterSpacing = '.1em' ;
+      text.setAttribute('dy', '-.13em');
+      textDouble.setAttribute('dy', '-.13em');
+      group.style.letterSpacing = '.1em';
     }
 
     if(this.lineStyle.props.startOffset) {
-      this.path.offset = (halfPatternLength + .5) * this.fontSize;
-      this.textPathDouble.setAttribute('startOffset', `-${this.path.offset}px`);
+      textPathDouble.setAttribute('startOffset', `-${this.pathOffset}px`);
     }
     else if(this.lineStyle.props.startOffsetBetween) {
-      this.path.offset = halfPatternLength * this.fontSize;
-      this.textPathDouble.setAttribute('startOffset', `-${this.path.offset}px`);
+      textPathDouble.setAttribute('startOffset', `-${this.pathOffset}px`);
     }
 
     this.setRotation();
-
-    if(this.lineStyle.props.waves) {
-      this.waves.counter = 0;
-      this.waves.idDirectionUp = true;
-    }
+    this.setWaves();
   }
 
   setRotation() {
@@ -216,21 +227,27 @@ export default class EmojiBrush extends HTMLElement {
     }
   }
 
+  setWaves() {
+    if(this.lineStyle.props.waves) {
+      this.waves.counter = 0;
+      this.waves.idDirectionUp = true;
+    }
+  }
+
   onMouseMove(event) {
     let coords = this.getMouseOffset(event);
-    let {start} = this.path;
-
+    let {start} = this.current;
 
     const moveSize = getStep({
-      from: this.lastPoint,
+      from: this.points.last,
       to: coords
     });
 
     if(moveSize > this.moveThreshold.value) {
-      this.points.push(coords);
+      this.points.list.push(coords);
       this.updatePath(coords);
       this.updateText();
-      this.lastPoint = coords;
+      this.points.last = coords;
     }
 
     this.clickedPath = null;
@@ -242,15 +259,15 @@ export default class EmojiBrush extends HTMLElement {
       this.mouseClickPath();
 
       // Remove latest path
-      this.path.group.remove();
+      this.current.group.remove();
       this.paintArea.removeEventListener('mousemove', this.onMouseMove);
       return;
     }
 
     // There was not mouse move
-    if(this.points.length == 0) {
+    if(this.points.list.length == 0 && this.current.group) {
       // Remove latest path
-      this.path.group.remove();
+      this.current.group.remove();
       this.paintArea.removeEventListener('mousemove', this.onMouseMove);
       return;
     }
@@ -258,11 +275,11 @@ export default class EmojiBrush extends HTMLElement {
     this.unselect();
 
     // Or continue with latest path
-    this.lastPoint = this.getMouseOffset(event);;
-    let {start} = this.path;
-    this.path.elem.classList.remove('current-path');
+    this.points.last = this.getMouseOffset(event);;
+    let {start} = this.current;
+    this.current.path.classList.remove('current-path');
 
-    this.updatePath(this.lastPoint);
+    this.updatePath(this.points.last);
     this.updateText();
 
     this.paintArea.removeEventListener('mousemove', this.onMouseMove);
@@ -307,18 +324,18 @@ export default class EmojiBrush extends HTMLElement {
   }
 
   updatePath({x, y}) {
-    let {start} = this.path;
-    const points = pointsToStr(this.points);
+    let {start} = this.current;
+    const points = pointsToStr(this.points.list);
 
-    this.path.elem.setAttribute(
+    this.current.path.setAttribute(
       'd',
       `M${start.x},${start.y} ${points} ${x},${y}`);
   }
 
   updateText(params = {}) {
     const {textPath, textPathDouble} = params;
-    const targetTextPath = textPath || this.textPath;
-    const targetTextPathDouble = textPathDouble || this.textPathDouble;
+    const targetTextPath = textPath || this.current.textPath;
+    const targetTextPathDouble = textPathDouble || this.current.textPathDouble;
 
     // this.pathFills.koeff need to add more symbols for tiny font-size
     for(let i = 0; i < this.pathFills.koeff; i++) {
@@ -336,11 +353,11 @@ export default class EmojiBrush extends HTMLElement {
 
   fillRestOfPath(params = {}) {
     const {path, textPath, textPathDouble} = params;
-    const pathToAdjust = path || this.path.elem;
-    const textPathToAdjust = textPath || this.textPath;
-    const textPathDoubleToAdjust = textPath || this.textPath;
+    const pathToAdjust = path || this.current.path;
+    const textPathToAdjust = textPath || this.current.textPath;
+    const textPathDoubleToAdjust = textPath || this.current.textPath;
 
-    const pathFillsMax = pathToAdjust.getTotalLength() / this.fontSize + this.path.offset;
+    const pathFillsMax = pathToAdjust.getTotalLength() / this.fontSize + this.pathOffset;
     const tSpansLength = textPathToAdjust.children.length;
     let missedSymbols = pathFillsMax - tSpansLength;
 
@@ -493,8 +510,31 @@ export default class EmojiBrush extends HTMLElement {
     }
   }
 
-  changeStyle() {
+  changeLineStyle() {
     this.lineStyle = lineStyles[this.selectStyle.value];
+
+    this.setPathOffset();
+
+    this.changeLineStyleOnSelected();
+  }
+
+  setPathOffset() {
+    const halfPatternLength = Math.round(this.symbols.list.length / 2);
+
+    if(this.lineStyle.props.mirrored) {
+      this.pathOffset = .5 * this.fontSize;
+    }
+
+    if(this.lineStyle.props.startOffset) {
+      this.pathOffset = (halfPatternLength + .5) * this.fontSize;
+    }
+    else if(this.lineStyle.props.startOffsetBetween) {
+      this.pathOffset = halfPatternLength * this.fontSize;
+    }
+  }
+
+  changeLineStyleOnSelected() {
+
   }
 
   changeFontSize() {
@@ -508,6 +548,8 @@ export default class EmojiBrush extends HTMLElement {
     else if(this.fontSize >= 40) {
       this.pathFills.koeff = 1;
     }
+
+    this.setPathOffset();
 
     this.changeFontSizeOnSelected();
   }
