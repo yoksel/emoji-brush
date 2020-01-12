@@ -48,7 +48,7 @@ export default class EmojiBrush extends HTMLElement {
       idDirectionUp: true
     };
 
-    // Fix filling path is mouse moves too fast
+    // Used to add more symbols for tiny font-size
     this.pathFills = {};
 
     this.symbols = {
@@ -283,7 +283,6 @@ export default class EmojiBrush extends HTMLElement {
     this.updateText();
 
     this.paintArea.removeEventListener('mousemove', this.onMouseMove);
-
     this.fillRestOfPath();
   }
 
@@ -333,37 +332,41 @@ export default class EmojiBrush extends HTMLElement {
   }
 
   updateText(params = {}) {
-    const {textPath, textPathDouble} = params;
-    const targetTextPath = textPath || this.current.textPath;
-    const targetTextPathDouble = textPathDouble || this.current.textPathDouble;
+    if(!params.textPath) {
+      params = this.current;
+    }
+
+    let {textPath, textPathDouble} = params;
 
     // this.pathFills.koeff need to add more symbols for tiny font-size
     for(let i = 0; i < this.pathFills.koeff; i++) {
       let symbol = this.getSymbol();
-      targetTextPath.insertAdjacentHTML('beforeEnd', symbol);
+      textPath.insertAdjacentHTML('beforeEnd', symbol);
 
-      if(targetTextPathDouble) {
+      if(textPathDouble) {
         if(this.lineStyle.props.scattered) {
           symbol = this.getSymbol();
         }
-        targetTextPathDouble.insertAdjacentHTML('beforeEnd', symbol);
+        textPathDouble.insertAdjacentHTML('beforeEnd', symbol);
       }
     }
   }
 
+  // Fill empty path if mouse moves too fast
   fillRestOfPath(params = {}) {
-    const {path, textPath, textPathDouble} = params;
-    const pathToAdjust = path || this.current.path;
-    const textPathToAdjust = textPath || this.current.textPath;
-    const textPathDoubleToAdjust = textPath || this.current.textPath;
+    if(!params.textPath) {
+      params = this.current;
+    }
 
-    const pathFillsMax = pathToAdjust.getTotalLength() / this.fontSize + this.pathOffset;
-    const tSpansLength = textPathToAdjust.children.length;
+    let {path, textPath, textPathDouble} = params;
+    const pathFillsMax = path.getTotalLength() / this.fontSize + this.pathOffset;
+    const tSpansLength = textPath.children.length;
     let missedSymbols = pathFillsMax - tSpansLength;
 
     if(!missedSymbols) {
       return;
     }
+
     for(let i = 0; i < missedSymbols; i++) {
       this.updateText(params);
     }
