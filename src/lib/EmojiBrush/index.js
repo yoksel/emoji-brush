@@ -181,18 +181,15 @@ export default class EmojiBrush extends HTMLElement {
       hasCurrent = true;
     }
 
-    let {group, text, textDouble, textPathDouble} = params;
+    if(this.lineStyle.props.double && !params.textDouble) {
+      let {textDouble, textPathDouble} = this.getTextDouble(params);
 
-    if(this.lineStyle.props.double && !textDouble) {
-      textDouble = text.cloneNode(true);
-      textPathDouble = textDouble.querySelector('textPath');
-
-      if(hasCurrent) {
-        this.current.textDouble = textDouble;
-        this.current.textPathDouble = textPathDouble;
-        this.current.group.append(this.current.textDouble);
-      }
+      params.textDouble = textDouble;
+      params.textPathDouble = textPathDouble;
     }
+
+    let {group, text, textDouble, textPathDouble} = params;
+    text.setAttribute('dy', '.35em');
 
     if(this.lineStyle.props.mirrored) {
       text.setAttribute('dy', '-.12em');
@@ -233,6 +230,18 @@ export default class EmojiBrush extends HTMLElement {
       this.waves.counter = 0;
       this.waves.idDirectionUp = true;
     }
+  }
+
+  getTextDouble(params) {
+    let {group, text} = params;
+
+    const textDouble = text.cloneNode(true);
+    textDouble.classList.add('text--double');
+    const textPathDouble = textDouble.querySelector('textPath');
+    textPathDouble.classList.add('text-path--double');
+    group.append(textDouble);
+
+    return {textDouble, textPathDouble};
   }
 
   onMouseMove(event) {
