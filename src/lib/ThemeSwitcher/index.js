@@ -73,6 +73,8 @@ export default class ThemeSwitcher extends HTMLElement {
   }
 
   onControlClick(event) {
+    event.stopPropagation();
+
     if(this.isCollapsed) {
       this.isCollapsed = false;
       this.controls.classList.remove(this.cls.collapsed);
