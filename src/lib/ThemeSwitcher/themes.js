@@ -10,59 +10,86 @@ export const baseAccents = {
 
 export const themes = [
   {
-    name: 'Sea',
-    colors:
-      [
-        '#022E40',
-        'teal',
-        'turquoise',
-      ]
-  },
-  {
-    name: 'North Sky',
-    colors:
-      [
-        '#253B59',
-        '#96D9C6',
-      ]
-  },
-  {
-    name: 'Deep Night',
-    colors:
-      [
-        '#011526',
-        '#022E40',
-        '#074A59',
-        '#266573',
-      ]
-  },
-  {
-    name: 'Deep Space',
-    colors:
-      [
-        '#071218',
-        '#1E5277'
-      ]
-  },
-  {
-    name: 'Steelblue',
-    colors: ['steelblue']
-  },
-  {
-    name: 'Teal',
-    colors: ['teal']
-  },
-  {
-    name: 'Darkslateblue',
-    colors: ['darkslateblue']
+    name: 'Firebrick',
+    colors: ['firebrick']
   },
   {
     name: 'Indianred',
     colors: ['indianred']
   },
   {
-    name: 'Firebrick',
-    colors: ['firebrick']
+    name: 'Gold',
+    colors: ['gold'],
+    accents: {
+      ...baseAccents,
+      base: '#000',
+      basetransp: 'rgba(0,0,0,.5)',
+      text: '#FFF',
+      texttransp: 'rgba(255,255,255,.5)'
+    }
+  },
+  {
+    name: 'khaki',
+    colors: ['khaki'],
+    accents: {
+      ...baseAccents,
+      base: '#000',
+      basetransp: 'rgba(0,0,0,.5)',
+      text: '#FFF',
+      texttransp: 'rgba(255,255,255,.5)'
+    }
+  },
+  {
+    name: 'Yellowgreen',
+    colors: ['yellowgreen'],
+    accents: {
+      ...baseAccents,
+      base: '#000',
+      basetransp: 'rgba(0,0,0,.5)',
+      text: '#FFF',
+      texttransp: 'rgba(255,255,255,.5)'
+    }
+  },
+  {
+    name: 'Turquoise',
+    colors: ['turquoise'],
+    accents: {
+      ...baseAccents,
+      base: '#000',
+      basetransp: 'rgba(0,0,0,.5)',
+      text: '#FFF',
+      texttransp: 'rgba(255,255,255,.5)'
+    }
+  },
+  {
+    name: 'Teal',
+    colors: ['teal']
+  },
+  {
+    name: 'Skyblue',
+    colors: ['skyblue'],
+    accents: {
+      ...baseAccents,
+      base: '#000',
+      basetransp: 'rgba(0,0,0,.5)',
+      text: '#FFF',
+      texttransp: 'rgba(255,255,255,.5)'
+    }
+  },
+  {
+    name: 'Steelblue',
+    colors: ['steelblue']
+  },{
+    name: 'Midnightblue',
+    colors: ['midnightblue']
+  },
+  {
+    name: 'Darkslateblue',
+    colors: ['darkslateblue']
+  },
+  {
+    name: 'Indigo',
+    colors: ['indigo']
   },
   {
     name: 'Purple',
