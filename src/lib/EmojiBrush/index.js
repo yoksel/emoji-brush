@@ -553,7 +553,45 @@ export default class EmojiBrush extends HTMLElement {
   }
 
   changeLineStyleOnSelected() {
+    if(Object.values(this.selected).length === 0) {
+      return;
+    }
 
+    for(let key in this.selected) {
+      const group = this.selected[key];
+      const path = group.querySelector('path');
+      const text = group.querySelector('text');
+      const textPath = group.querySelector('.text-path');
+      let textDouble = group.querySelector('.text--double');
+      let textPathDouble = group.querySelector('.text-path--double');
+      textPath.innerHTML = '';
+
+      if(textPathDouble) {
+        textPathDouble.innerHTML = '';
+      }
+
+      if(!this.lineStyle.props.double) {
+        textPathDouble = null;
+      }
+      else if(!textPathDouble) {
+        let doubledText = this.getTextDouble({group, text});
+        textDouble = doubledText.textDouble;
+        textPathDouble = doubledText.textPathDouble;
+        textPathDouble.innerHTML = '';
+      }
+
+      const params = {
+        group,
+        path,
+        text,
+        textPath,
+        textDouble,
+        textPathDouble
+      };
+
+      this.modifyPaths(params);
+      this.fillRestOfPath(params);
+    }
   }
 
   changeFontSize() {
