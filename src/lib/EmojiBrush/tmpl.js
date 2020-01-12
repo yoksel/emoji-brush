@@ -192,6 +192,10 @@ templateStyles.innerHTML = `<style>
     margin: auto;
   }
 
+  .disclaimer {
+    font-size: .9em;
+  }
+
   .socials {
     display: flex;
     list-style-type: none;
@@ -286,6 +290,10 @@ templateMarkup.innerHTML = `
         <span class="socials__username visuallyhidden">yoksel_en</span></a>
     </li>
   </ul>
+
+  <div class="disclaimer">
+    🛠 Deeply experimental. May not work on your device or browser. Sorry 💚
+  </div>
 
   <div class="controls">
     <button
