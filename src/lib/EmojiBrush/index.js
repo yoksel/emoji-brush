@@ -70,6 +70,7 @@ export default class EmojiBrush extends HTMLElement {
     this.bodyKeyDown = this.bodyKeyDown.bind(this);
     this.changeTheme = this.changeTheme.bind(this);
     this.chooseSymbolsInput = this.chooseSymbolsInput.bind(this);
+    this.bodyMouseOut = this.bodyMouseOut.bind(this);
 
     this.initSelect({
       elem: this.selectSymbols,
@@ -110,7 +111,6 @@ export default class EmojiBrush extends HTMLElement {
     // document.body.addEventListener('keydown', this.bodyKeyDown);
 
     document.addEventListener('change-theme', this.changeTheme);
-    document.addEventListener('mouseout', this.onMouseUp);
   }
 
   disconnectedCallback() {
@@ -171,6 +171,8 @@ export default class EmojiBrush extends HTMLElement {
     this.modifyPaths();
 
     this.paintArea.addEventListener('mousemove', this.onMouseMove);
+    document.body.addEventListener('mouseout', this.bodyMouseOut);
+    this.mouseOutPoints = {};
   }
 
   modifyPaths(params = {}) {
@@ -245,6 +247,12 @@ export default class EmojiBrush extends HTMLElement {
   }
 
   onMouseMove(event) {
+    if(!event.buttons) {
+      this.mouseOutPoints.finishPath = true;
+      this.onMouseUp(event);
+      return;
+    }
+
     let coords = this.getMouseOffset(event);
     let {start} = this.current;
 
@@ -290,7 +298,12 @@ export default class EmojiBrush extends HTMLElement {
     }
 
     // Or continue with latest path
-    this.points.last = this.getMouseOffset(event);;
+    this.points.last = this.getMouseOffset(event);
+
+    if(this.mouseOutPoints && this.mouseOutPoints.finishPath) {
+      this.points.last = this.mouseOutPoints.coords;
+    }
+
     let {start} = this.current;
     this.current.path.classList.remove('current-path');
 
@@ -298,6 +311,7 @@ export default class EmojiBrush extends HTMLElement {
     this.updateText();
 
     this.paintArea.removeEventListener('mousemove', this.onMouseMove);
+    document.body.removeEventListener('mouseout', this.bodyMouseOut);
     this.fillRestOfPath();
   }
 
@@ -313,6 +327,12 @@ export default class EmojiBrush extends HTMLElement {
     else if(event.keyCode === 16) {
       this.isStraightLine = false;
     }
+  }
+
+  bodyMouseOut(event) {
+    this.mouseOutPoints = {
+      coords: this.getMouseOffset(event)
+    };
   }
 
   bodyKeyDown(event) {
