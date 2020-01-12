@@ -508,17 +508,23 @@ export default class EmojiBrush extends HTMLElement {
     }
 
     for(let key in this.selected) {
-      const path = this.selected[key].querySelector('path');
-      const textPaths = this.selected[key].querySelectorAll('textPath');
+      const group = this.selected[key];
+      const path = group.querySelector('path');
+      const textPath = group.querySelector('.text-path');
+      let textPathDouble = group.querySelector('.text-path--double');
+      textPath.innerHTML = '';
+      if(textPathDouble) {
+        textPathDouble.innerHTML = '';
+      }
 
-      for (let textPath of textPaths) {
-        textPath.innerHTML = '';
+      if(!this.lineStyle.props.double) {
+        textPathDouble = null;
       }
 
       this.fillRestOfPath({
         path,
-        textPath: textPaths[0],
-        textPathDouble: textPaths[1]
+        textPath,
+        textPathDouble
       });
     }
   }
@@ -573,9 +579,10 @@ export default class EmojiBrush extends HTMLElement {
     }
 
     for(let key in this.selected) {
-      const texts = this.selected[key].querySelectorAll('text');
-      const path = this.selected[key].querySelector('path');
-      const textPath = this.selected[key].querySelector('textPath');
+      const group = this.selected[key];
+      const texts = group.querySelectorAll('text');
+      const path = group.querySelector('path');
+      const textPath = group.querySelector('textPath');
       path.setAttribute('stroke-width', this.fontSize);
 
       for(let text of texts) {

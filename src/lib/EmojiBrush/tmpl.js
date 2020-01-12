@@ -199,7 +199,7 @@ templateGroup.innerHTML = `<path
   d=""
   stroke-width="{fontSize}"></path>
 <text
-  font-size="{fontSize}">
-  <textPath href="#path-{id}"></textPath>
+  font-size="{fontSize}" class="text">
+  <textPath href="#path-{id}" class="text-path"></textPath>
 </text>
 `;
