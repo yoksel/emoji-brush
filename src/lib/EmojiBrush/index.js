@@ -112,8 +112,8 @@ export default class EmojiBrush extends HTMLElement {
   connectedCallback() {
     this.clearControl.addEventListener('click', this.clear);
 
-    this.paintArea.addEventListener('mousedown', this.onMouseDown);
-    this.paintArea.addEventListener('mouseup', this.onMouseUp);
+    this.paintArea.addEventListener('pointerdown', this.onMouseDown);
+    this.paintArea.addEventListener('pointerup', this.onMouseUp);
 
     this.inputSymbolsChoice.addEventListener('click', this.chooseSymbolsInput);
     this.addSymbols.addEventListener('input', this.changeSymbolsSet);
@@ -182,8 +182,8 @@ export default class EmojiBrush extends HTMLElement {
 
     this.modifyPaths();
 
-    this.paintArea.addEventListener('mousemove', this.onMouseMove);
-    document.body.addEventListener('mouseout', this.bodyMouseOut);
+    this.paintArea.addEventListener('pointermove', this.onMouseMove);
+    document.body.addEventListener('pointerout', this.bodyMouseOut);
     this.mouseOutPoints = {};
   }
 
@@ -290,7 +290,7 @@ export default class EmojiBrush extends HTMLElement {
 
       // Remove latest path
       this.current.group.remove();
-      this.paintArea.removeEventListener('mousemove', this.onMouseMove);
+      this.paintArea.removeEventListener('pointermove', this.onMouseMove);
       return;
     }
 
@@ -298,7 +298,7 @@ export default class EmojiBrush extends HTMLElement {
     if(this.points.list.length == 0 && this.current.group) {
       // Remove latest path
       this.current.group.remove();
-      this.paintArea.removeEventListener('mousemove', this.onMouseMove);
+      this.paintArea.removeEventListener('pointermove', this.onMouseMove);
       return;
     }
 
@@ -322,8 +322,8 @@ export default class EmojiBrush extends HTMLElement {
     this.updatePath(this.points.last);
     this.updateText();
 
-    this.paintArea.removeEventListener('mousemove', this.onMouseMove);
-    document.body.removeEventListener('mouseout', this.bodyMouseOut);
+    this.paintArea.removeEventListener('pointermove', this.onMouseMove);
+    document.body.removeEventListener('pointerout', this.bodyMouseOut);
     this.fillRestOfPath();
     this.controls.dataset.state = '';
     this.controlGet.disabled = !this.targetGroup.innerHTML;
