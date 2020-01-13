@@ -70,7 +70,7 @@ export default class EmojiBrush extends HTMLElement {
     };
     this.symbols.list = getSymbolsList(this.symbols.str);
 
-    this.lineStyle = Object.values(lineStyles)[0];
+    this.lineStyle = this.getRandomLineStyle();
     this.fontSize = fontSizes[3];
 
     this.onMouseDown = this.onMouseDown.bind(this);
@@ -98,7 +98,8 @@ export default class EmojiBrush extends HTMLElement {
       elem: this.selectStyle,
       list: Object.values(lineStyles),
       handler: this.changeLineStyle,
-      currentValue: 'mirrored-offset'
+      currentValue: 'mirrored-offset',
+      currentValue: this.lineStyle.name
     });
 
     this.initSelect({
@@ -771,5 +772,11 @@ export default class EmojiBrush extends HTMLElement {
       x: scale * (event.clientX - left),
       y: scale * (event.clientY - top)
     };
+  }
+
+  getRandomLineStyle() {
+    const keys = Object.keys(lineStyles);
+    const randomKey = keys[Math.floor(Math.random() * keys.length)]
+    return lineStyles[randomKey];
   }
 }
