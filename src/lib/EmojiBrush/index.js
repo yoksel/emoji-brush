@@ -521,6 +521,7 @@ export default class EmojiBrush extends HTMLElement {
 
   setPathOffset() {
     const halfPatternLength = Math.round(this.symbols.list.length / 2);
+    this.pathOffset = 0;
 
     if(this.lineStyle.props.mirrored) {
       this.pathOffset = .5 * this.fontSize;
