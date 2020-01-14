@@ -57,10 +57,6 @@ templateStyles.innerHTML = `<style>
     pointer-events: none;
   }
 
-  .paint-area textPath {
-    fill: currentColor;
-  }
-
   SELECT,
   INPUT {
     height: 2rem;
@@ -316,6 +312,9 @@ templateGroup.innerHTML = `<path
   fill="none"></path>
 <text
   font-size="{fontSize}" class="text">
-  <textPath href="#path-{id}" class="text-path"></textPath>
+  <textPath
+    href="#path-{id}"
+    class="text-path"
+    fill="currentColor"></textPath>
 </text>
 `;

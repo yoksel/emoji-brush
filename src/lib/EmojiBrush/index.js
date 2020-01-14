@@ -736,7 +736,13 @@ export default class EmojiBrush extends HTMLElement {
   }
 
   getStyleStr() {
-    return `background: ${this.getBackgroundStr(this.theme)}; color: ${this.accents.base}`;
+    // Trebuchet MS, Verdana
+    const styleslist = [
+      `background: ${this.getBackgroundStr(this.theme)}`,
+      `font-family: Trebuchet MS, Verdana, sans-erif`,
+      `color: ${this.accents.base}`
+    ]
+    return styleslist.join('; ');
   }
 
   preparePng() {
