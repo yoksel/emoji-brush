@@ -178,6 +178,9 @@ templateStyles.innerHTML = `<style>
   .controls[data-state="ready"] .control {
     opacity: 1;
     pointer-events: auto;
+    box-shadow:
+      0 0 0 2px var(--color-base) inset,
+      0 0 1rem .25rem var(--color-focushover);
   }
 
   .theme-switcher {
