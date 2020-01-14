@@ -15,7 +15,11 @@ export const themes = [
   },
   {
     name: 'Indianred',
-    colors: ['indianred']
+    colors: ['indianred'],
+    accents: {
+      ...baseAccents,
+      focus: 'purple',
+    }
   },
   {
     name: 'Gold',
@@ -25,7 +29,8 @@ export const themes = [
       base: '#000',
       basetransp: 'rgba(0,0,0,.5)',
       text: '#FFF',
-      texttransp: 'rgba(255,255,255,.5)'
+      texttransp: 'rgba(255,255,255,.5)',
+      focushover: 'yellowgreen'
     }
   },
   {
@@ -36,7 +41,8 @@ export const themes = [
       base: '#000',
       basetransp: 'rgba(0,0,0,.5)',
       text: '#FFF',
-      texttransp: 'rgba(255,255,255,.5)'
+      texttransp: 'rgba(255,255,255,.5)',
+      focushover: 'yellowgreen'
     }
   },
   {
@@ -46,8 +52,10 @@ export const themes = [
       ...baseAccents,
       base: '#000',
       basetransp: 'rgba(0,0,0,.5)',
+      hover: 'dodgerblue',
       text: '#FFF',
-      texttransp: 'rgba(255,255,255,.5)'
+      texttransp: 'rgba(255,255,255,.5)',
+      focushover: 'teal'
     }
   },
   {
@@ -57,6 +65,7 @@ export const themes = [
       ...baseAccents,
       base: '#000',
       basetransp: 'rgba(0,0,0,.5)',
+      hover: 'teal',
       text: '#FFF',
       texttransp: 'rgba(255,255,255,.5)'
     }
@@ -72,6 +81,7 @@ export const themes = [
       ...baseAccents,
       base: '#000',
       basetransp: 'rgba(0,0,0,.5)',
+      hover: 'teal',
       text: '#FFF',
       texttransp: 'rgba(255,255,255,.5)'
     }
