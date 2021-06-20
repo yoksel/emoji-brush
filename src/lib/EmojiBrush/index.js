@@ -390,12 +390,13 @@ export default class EmojiBrush extends HTMLElement {
 
     // this.pathFills.koeff need to add more symbols for tiny font-size
     for(let i = 0; i < this.pathFills.koeff; i++) {
-      let symbol = this.getSymbol();
+      let growthAge = params.textPath.getNumberOfChars();
+      let symbol = this.getSymbol(growthAge);
       textPath.insertAdjacentHTML('beforeEnd', symbol);
 
       if(textPathDouble) {
         if(this.lineStyle.props.scattered) {
-          symbol = this.getSymbol();
+          symbol = this.getSymbol(growthAge);
         }
         textPathDouble.insertAdjacentHTML('beforeEnd', symbol);
       }
@@ -422,11 +423,11 @@ export default class EmojiBrush extends HTMLElement {
     }
   }
 
-  getSymbol() {
+  getSymbol(growthAge) {
     let symbol = this.symbols.list[this.symbols.currentPos];
     let rotateAttr = this.getRotateAttr();
     let dyAttr = this.getDYWavesAttr();
-    let fontSizeAttr = this.getFontSizeAttr();
+    let fontSizeAttr = this.getFontSizeAttr(growthAge);
 
     this.symbols.currentPos++;
 
@@ -484,12 +485,13 @@ export default class EmojiBrush extends HTMLElement {
     return dyAttr;
   }
 
-  getFontSizeAttr() {
+  getFontSizeAttr(growthAge) {
     if(!this.lineStyle.props.scattered) {
       return '';
     }
 
-    const fontSize = (Math.random() * 1.25 + .25).toFixed(2);
+    const growCoefficent = this.lineStyle.props.grow && growthAge ? growthAge / 20 : 1;
+    const fontSize = (Math.random() * 1.25 * growCoefficent + .25).toFixed(2);
 
     return ` font-size="${fontSize}em"`;
   }
