@@ -302,6 +302,8 @@ templateMarkup.innerHTML = `
     <div class="controls__downloads">
       <a
         class="control control--download-png">Download PNG</a>
+      <a
+        class="control control--download-svg">Download SVG</a>
     </div>
   </div>
 </div>

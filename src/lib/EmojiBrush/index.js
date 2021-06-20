@@ -32,7 +32,8 @@ export default class EmojiBrush extends HTMLElement {
     this.controlGet = this.elem.querySelector('.control--get');
     this.controlGet.disabled = true;
     this.links = {
-      png: this.elem.querySelector('.control--download-png')
+      png: this.elem.querySelector('.control--download-png'),
+      svg: this.elem.querySelector('.control--download-svg')
     };
 
     this.selected = {};
@@ -196,12 +197,13 @@ export default class EmojiBrush extends HTMLElement {
       hasCurrent = true;
     }
 
-    if(this.lineStyle.props.double && !params.textDouble) {
+    if(!params.textDouble) {
       let {textDouble, textPathDouble} = this.getTextDouble(params);
 
       params.textDouble = textDouble;
       params.textPathDouble = textPathDouble;
     }
+    this.updateDoubleVisibility(params.textPathDouble);
 
     let {group, text, textDouble, textPathDouble} = params;
     text.setAttribute('dy', '.35em');
@@ -228,6 +230,10 @@ export default class EmojiBrush extends HTMLElement {
 
     this.setRotation();
     this.setWaves();
+  }
+
+  updateDoubleVisibility(textPathDouble) {
+    textPathDouble.setAttribute('opacity', this.lineStyle.props.double ? 1 : 0);
   }
 
   setRotation() {
@@ -390,12 +396,13 @@ export default class EmojiBrush extends HTMLElement {
 
     // this.pathFills.koeff need to add more symbols for tiny font-size
     for(let i = 0; i < this.pathFills.koeff; i++) {
-      let symbol = this.getSymbol();
+      let growthAge = params.textPath.getNumberOfChars();
+      let symbol = this.getSymbol(growthAge);
       textPath.insertAdjacentHTML('beforeEnd', symbol);
 
       if(textPathDouble) {
         if(this.lineStyle.props.scattered) {
-          symbol = this.getSymbol();
+          symbol = this.getSymbol(growthAge);
         }
         textPathDouble.insertAdjacentHTML('beforeEnd', symbol);
       }
@@ -417,22 +424,27 @@ export default class EmojiBrush extends HTMLElement {
       return;
     }
 
+    missedSymbols = Math.min(missedSymbols, 5);
+
     for(let i = 0; i < missedSymbols; i++) {
       this.updateText(params);
     }
   }
 
-  getSymbol() {
+  getSymbol(growthAge) {
     let symbol = this.symbols.list[this.symbols.currentPos];
+    if (this.lineStyle.props.sparse > 0 && this.lineStyle.props.sparse > Math.random()) {
+      symbol = ' ';
+    } else {
+      this.symbols.currentPos++;
+
+      if(this.symbols.currentPos === this.symbols.list.length) {
+        this.symbols.currentPos = 0;
+      }
+    }
     let rotateAttr = this.getRotateAttr();
     let dyAttr = this.getDYWavesAttr();
-    let fontSizeAttr = this.getFontSizeAttr();
-
-    this.symbols.currentPos++;
-
-    if(this.symbols.currentPos === this.symbols.list.length) {
-      this.symbols.currentPos = 0;
-    }
+    let fontSizeAttr = this.getFontSizeAttr(growthAge);
 
     symbol = `<tspan ${rotateAttr}${dyAttr}${fontSizeAttr}>${symbol}</tspan>`
 
@@ -484,12 +496,13 @@ export default class EmojiBrush extends HTMLElement {
     return dyAttr;
   }
 
-  getFontSizeAttr() {
+  getFontSizeAttr(growthAge) {
     if(!this.lineStyle.props.scattered) {
       return '';
     }
 
-    const fontSize = (Math.random() * 1.25 + .25).toFixed(2);
+    const growCoefficent = this.lineStyle.props.grow && growthAge ? growthAge / 20 : 1;
+    const fontSize = (Math.random() * 1.25 * growCoefficent + .25).toFixed(2);
 
     return ` font-size="${fontSize}em"`;
   }
@@ -582,10 +595,7 @@ export default class EmojiBrush extends HTMLElement {
       textPath.innerHTML = '';
       if(textPathDouble) {
         textPathDouble.innerHTML = '';
-      }
-
-      if(!this.lineStyle.props.double) {
-        textPathDouble = null;
+        this.updateDoubleVisibility(textPathDouble);
       }
 
       this.setWaves();
@@ -627,16 +637,7 @@ export default class EmojiBrush extends HTMLElement {
 
       if(textPathDouble) {
         textPathDouble.innerHTML = '';
-      }
-
-      if(!this.lineStyle.props.double) {
-        textPathDouble = null;
-      }
-      else if(!textPathDouble) {
-        let doubledText = this.getTextDouble({group, text});
-        textDouble = doubledText.textDouble;
-        textPathDouble = doubledText.textPathDouble;
-        textPathDouble.innerHTML = '';
+        this.updateDoubleVisibility(textPathDouble);
       }
 
       const params = {
@@ -750,6 +751,11 @@ export default class EmojiBrush extends HTMLElement {
     const svg64 = btoa(unescape(encodeURIComponent(xml)));
     const b64Start = 'data:image/svg+xml;base64,';
     const image64 = b64Start + svg64;
+
+    const blob = new Blob([xml], {type : 'image/svg+xml'});
+    let URLObj = window.URL || window.webkitURL;
+    this.links.svg.href = URLObj.createObjectURL(blob);
+    this.links.svg.download = 'emoji-brush-drawing.svg';
 
     const imgObj = new Image();
     imgObj.src = image64;
