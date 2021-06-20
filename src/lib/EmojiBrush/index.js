@@ -418,6 +418,8 @@ export default class EmojiBrush extends HTMLElement {
       return;
     }
 
+    missedSymbols = Math.min(missedSymbols, 5);
+
     for(let i = 0; i < missedSymbols; i++) {
       this.updateText(params);
     }
