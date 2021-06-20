@@ -32,7 +32,8 @@ export default class EmojiBrush extends HTMLElement {
     this.controlGet = this.elem.querySelector('.control--get');
     this.controlGet.disabled = true;
     this.links = {
-      png: this.elem.querySelector('.control--download-png')
+      png: this.elem.querySelector('.control--download-png'),
+      svg: this.elem.querySelector('.control--download-svg')
     };
 
     this.selected = {};
@@ -750,6 +751,11 @@ export default class EmojiBrush extends HTMLElement {
     const svg64 = btoa(unescape(encodeURIComponent(xml)));
     const b64Start = 'data:image/svg+xml;base64,';
     const image64 = b64Start + svg64;
+
+    const blob = new Blob([xml], {type : 'image/svg+xml'});
+    let URLObj = window.URL || window.webkitURL;
+    this.links.svg.href = URLObj.createObjectURL(blob);
+    this.links.svg.download = 'emoji-brush-drawing.svg';
 
     const imgObj = new Image();
     imgObj.src = image64;
