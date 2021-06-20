@@ -57,6 +57,18 @@ const lineStyles = {
       startOffsetBetween: true
     }
   },
+  'grow-random-sparse': {
+    name: 'grow-random-sparse',
+    props: {
+      grow: true,
+      sparse: 0.5,
+      waves: true,
+      double: true,
+      mirrored: false,
+      scattered: true,
+      startOffsetBetween: true
+    }
+  },
 };
 
 export default lineStyles;

@@ -427,15 +427,18 @@ export default class EmojiBrush extends HTMLElement {
 
   getSymbol(growthAge) {
     let symbol = this.symbols.list[this.symbols.currentPos];
+    if (this.lineStyle.props.sparse > 0 && this.lineStyle.props.sparse > Math.random()) {
+      symbol = ' ';
+    } else {
+      this.symbols.currentPos++;
+
+      if(this.symbols.currentPos === this.symbols.list.length) {
+        this.symbols.currentPos = 0;
+      }
+    }
     let rotateAttr = this.getRotateAttr();
     let dyAttr = this.getDYWavesAttr();
     let fontSizeAttr = this.getFontSizeAttr(growthAge);
-
-    this.symbols.currentPos++;
-
-    if(this.symbols.currentPos === this.symbols.list.length) {
-      this.symbols.currentPos = 0;
-    }
 
     symbol = `<tspan ${rotateAttr}${dyAttr}${fontSizeAttr}>${symbol}</tspan>`
 
