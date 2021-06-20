@@ -63,7 +63,7 @@ const lineStyles = {
       grow: true,
       sparse: 0.5,
       waves: true,
-      double: true,
+      double: false,
       mirrored: false,
       scattered: true,
       startOffsetBetween: true

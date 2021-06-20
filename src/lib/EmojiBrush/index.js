@@ -196,12 +196,13 @@ export default class EmojiBrush extends HTMLElement {
       hasCurrent = true;
     }
 
-    if(this.lineStyle.props.double && !params.textDouble) {
+    if(!params.textDouble) {
       let {textDouble, textPathDouble} = this.getTextDouble(params);
 
       params.textDouble = textDouble;
       params.textPathDouble = textPathDouble;
     }
+    this.updateDoubleVisibility(params.textPathDouble);
 
     let {group, text, textDouble, textPathDouble} = params;
     text.setAttribute('dy', '.35em');
@@ -228,6 +229,10 @@ export default class EmojiBrush extends HTMLElement {
 
     this.setRotation();
     this.setWaves();
+  }
+
+  updateDoubleVisibility(textPathDouble) {
+    textPathDouble.setAttribute('opacity', this.lineStyle.props.double ? 1 : 0);
   }
 
   setRotation() {
@@ -589,10 +594,7 @@ export default class EmojiBrush extends HTMLElement {
       textPath.innerHTML = '';
       if(textPathDouble) {
         textPathDouble.innerHTML = '';
-      }
-
-      if(!this.lineStyle.props.double) {
-        textPathDouble = null;
+        this.updateDoubleVisibility(textPathDouble);
       }
 
       this.setWaves();
@@ -634,16 +636,7 @@ export default class EmojiBrush extends HTMLElement {
 
       if(textPathDouble) {
         textPathDouble.innerHTML = '';
-      }
-
-      if(!this.lineStyle.props.double) {
-        textPathDouble = null;
-      }
-      else if(!textPathDouble) {
-        let doubledText = this.getTextDouble({group, text});
-        textDouble = doubledText.textDouble;
-        textPathDouble = doubledText.textPathDouble;
-        textPathDouble.innerHTML = '';
+        this.updateDoubleVisibility(textPathDouble);
       }
 
       const params = {
